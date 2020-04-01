@@ -496,18 +496,28 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 初始化容器，进行springmvc的9大组件初始化
 	 * Initialize the strategy objects that this servlet uses.
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
+		//多文件上传组件
 		initMultipartResolver(context);
+		//国际化组件，也就是本地语言环境
 		initLocaleResolver(context);
+		//初始化主题模板处理器
 		initThemeResolver(context);
+		//初始化HandMapping映射
 		initHandlerMappings(context);
+		//初始化HandlerAdapters参数适配器
 		initHandlerAdapters(context);
+		//初始化一场拦截组件
 		initHandlerExceptionResolvers(context);
+		//初始化视图预处理解析器，
 		initRequestToViewNameTranslator(context);
+		//初始化视图解析器
 		initViewResolvers(context);
+		//初始化FlashMap
 		initFlashMapManager(context);
 	}
 
