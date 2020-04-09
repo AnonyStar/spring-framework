@@ -56,6 +56,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 
 	/**
+	 * 无参构造函数
 	 * Create a new DefaultResourceLoader.
 	 * <p>ClassLoader access will happen using the thread context class loader
 	 * at the time of this ResourceLoader's initialization.
@@ -66,6 +67,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	}
 
 	/**
+	 * 带ClassLoader的有参构造函数
 	 * Create a new DefaultResourceLoader.
 	 * @param classLoader the ClassLoader to load class path resources with, or {@code null}
 	 * for using the thread context class loader at the time of actual resource access
@@ -144,6 +146,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
 
+		//1. 通过 ProtocolResolver 协议解析器来记载资源
 		for (ProtocolResolver protocolResolver : getProtocolResolvers()) {
 			Resource resource = protocolResolver.resolve(location, this);
 			if (resource != null) {
@@ -151,20 +154,23 @@ public class DefaultResourceLoader implements ResourceLoader {
 			}
 		}
 
+		//2.如果location是以 / 开头则返回 ClassPathContextResource 类型的 资源
 		if (location.startsWith("/")) {
 			return getResourceByPath(location);
-		}
+		}//3.如果是以 classpath: 开头，则返回 ClassPathResource 类型的资源
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
+				//4.如果不是以上两种，则判断是否是 File URL ,如果是返回FileUrlResource 否则 返回UrlResource
 				// Try to parse the location as a URL...
 				URL url = new URL(location);
 				return (ResourceUtils.isFileURL(url) ? new FileUrlResource(url) : new UrlResource(url));
 			}
 			catch (MalformedURLException ex) {
 				// No URL -> resolve as resource path.
+				//5.最后则返回ClassPathContextResource
 				return getResourceByPath(location);
 			}
 		}

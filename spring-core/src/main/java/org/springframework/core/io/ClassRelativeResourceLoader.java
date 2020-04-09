@@ -20,6 +20,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 从给定的 class 下加载资源
  * {@link ResourceLoader} implementation that interprets plain resource paths
  * as relative to a given {@code java.lang.Class}.
  *
@@ -43,6 +44,11 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 		setClassLoader(clazz.getClassLoader());
 	}
 
+	/**
+	 * 重写getResourceByPath 方法 ， 返回一个ClassRelativeContextResource 资源类型
+	 * @param path the path to the resource
+	 * @return
+	 */
 	@Override
 	protected Resource getResourceByPath(String path) {
 		return new ClassRelativeContextResource(path, this.clazz);
@@ -50,6 +56,8 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
 
 	/**
+	 * 继承 ClassPathResource  定义资源类型，实现ContextResource 中的 getPathWithinContext 方法，
+	 *
 	 * ClassPathResource that explicitly expresses a context-relative path
 	 * through implementing the ContextResource interface.
 	 */
@@ -57,6 +65,11 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
 		private final Class<?> clazz;
 
+		/**
+		 * 调用父类 ClassPathResource 对资源进行初始化
+		 * @param path
+		 * @param clazz
+		 */
 		public ClassRelativeContextResource(String path, Class<?> clazz) {
 			super(path, clazz);
 			this.clazz = clazz;
@@ -67,6 +80,11 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 			return getPath();
 		}
 
+		/**
+		 * 重写 ClassPathContext 中方法， 通过给定的路径返回一个ClassRelativeContextResource资源
+		 * @param relativePath the relative path (relative to this resource)
+		 * @return
+		 */
 		@Override
 		public Resource createRelative(String relativePath) {
 			String pathToUse = StringUtils.applyRelativePath(getPath(), relativePath);

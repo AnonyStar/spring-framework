@@ -33,11 +33,12 @@ import org.springframework.lang.Nullable;
 public interface ProtocolResolver {
 
 	/**
+	 * 使用指定的ResourceLoader  来解析location路径的 资源
 	 * Resolve the given location against the given resource loader
 	 * if this implementation's protocol matches.
 	 * @param location the user-specified resource location
 	 * @param resourceLoader the associated resource loader
-	 * @return a corresponding {@code Resource} handle if the given location
+	 * @return a corresponding {@code Resource} handle if the given location //返回对应的Resource
 	 * matches this resolver's protocol, or {@code null} otherwise
 	 */
 	@Nullable

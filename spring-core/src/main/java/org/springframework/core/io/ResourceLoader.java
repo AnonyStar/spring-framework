@@ -46,6 +46,12 @@ public interface ResourceLoader {
 
 
 	/**
+	 * 返回指定路径的资源处理器
+	 * 必须支持完全限定的网址： "file:C:/test.dat"
+	 * 必须支持ClassPath 的 URL  :"classpath:test.dat"
+	 * 必须支持相对路径  ： "WEB-INF/test.dat"
+	 * 并不能保证资源是否物理存在，需要自己去检测通过existence
+	 * 再spring中所有的应用上下文都去实现这个接口，可以进行资源的加载
 	 * Return a Resource handle for the specified resource location.
 	 * <p>The handle should always be a reusable resource descriptor,
 	 * allowing for multiple {@link Resource#getInputStream()} calls.
@@ -67,6 +73,7 @@ public interface ResourceLoader {
 	Resource getResource(String location);
 
 	/**
+	 * 返回当前类的 ClassLoader 对象
 	 * Expose the ClassLoader used by this ResourceLoader.
 	 * <p>Clients which need to access the ClassLoader directly can do so
 	 * in a uniform manner with the ResourceLoader, rather than relying
