@@ -81,6 +81,7 @@ public class XmlValidationModeDetector {
 
 
 	/**
+	 * 通过指定的 inputStream 来检测 XML 中的验证模型
 	 * Detect the validation mode for the XML document in the supplied {@link InputStream}.
 	 * Note that the supplied {@link InputStream} is closed by this method before returning.
 	 * @param inputStream the InputStream to parse
@@ -89,25 +90,33 @@ public class XmlValidationModeDetector {
 	 * @see #VALIDATION_XSD
 	 */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
+		//<1> 通过 BufferedReader 读取inputStream
 		// Peek into the file to look for DOCTYPE.
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		try {
+			//<2> 是否是DTD验证模式 ，默认否
 			boolean isDtdValidated = false;
 			String content;
+			// <3> 逐行读取内容
 			while ((content = reader.readLine()) != null) {
+
 				content = consumeCommentTokens(content);
+				// <4> 如果是注释或者为空这跳过
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// <5> 校验是否包含 DOCTYPE 若包含则为DTD模式
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				// <6> 校验是否是打开的标签， 如果一行有 <  并且后面跟着是字母，那么返回
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
 				}
 			}
+			// 确定解析方式
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
@@ -116,12 +125,14 @@ public class XmlValidationModeDetector {
 			return VALIDATION_AUTO;
 		}
 		finally {
+			//关闭流
 			reader.close();
 		}
 	}
 
 
 	/**
+	 * 判断是否包含 DOCTYPE
 	 * Does the content contain the DTD DOCTYPE declaration?
 	 */
 	private boolean hasDoctype(String content) {
@@ -137,9 +148,10 @@ public class XmlValidationModeDetector {
 		if (this.inComment) {
 			return false;
 		}
-		int openTagIndex = content.indexOf('<');
-		return (openTagIndex > -1 && (content.length() > openTagIndex + 1) &&
-				Character.isLetter(content.charAt(openTagIndex + 1)));
+		int openTagIndex = content.indexOf('<'); // 获取字符中 < 的索引
+		return (openTagIndex > -1  // 存在 <
+				&& (content.length() > openTagIndex + 1) // 并且后面还有内容
+				&&Character.isLetter(content.charAt(openTagIndex + 1)));//后面必须是字母
 	}
 
 	/**
